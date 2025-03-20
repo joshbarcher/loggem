@@ -1,6 +1,6 @@
 {
   "name": "@jarcher/loggem",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A custom logging package",
   "main": "index.js",
   "type": "module",
@@ -10,24 +10,20 @@
     "node": ">= 14.0.0",
     "npm": ">= 6.0.0"
   },
-  "homepage": "",
+  "homepage": "https://github.com/joshbarcher",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/joshbarcher/loggem"
   },
-  "bugs": "",
-  "keywords": [],
   "author": {
-    "name": "",
-    "email": "",
-    "url": ""
-  },
-  "contributors": [],
-  "scripts": {
-    "dev": "",
-    "test": ""
+    "name": "Josh Archer",
+    "email": "jarcher@greenriver.edu",
+    "url": "https://github.com/joshbarcher"
   },
   "dependencies": {
     "tracer": "^1.3.0"
+  },
+  "publishConfig": {
+    "registry": "http://localhost:4873"
   }
 }
