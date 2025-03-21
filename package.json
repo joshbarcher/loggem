@@ -1,6 +1,6 @@
 {
   "name": "@jarcher/loggem",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A custom logging package",
   "main": "src/index.js",
   "type": "module",
@@ -21,6 +21,9 @@
     "url": "https://github.com/joshbarcher"
   },
   "dependencies": {
+    "@jarcher/enhanced-chalk": "^1.0.3",
+    "moment": "^2.30.1",
+    "strip-ansi": "^7.1.0",
     "tracer": "^1.3.0"
   },
   "publishConfig": {
