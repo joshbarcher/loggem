@@ -1,0 +1,18 @@
+[2025-03-22 18:46:40] index.js:72 LOG: Hello from the app!
+
+index.js:72 LOG: Now without timestamp
+
+[2025-03-22 18:46:40] index.js:74 WARN: Something might be off...
+[2025-03-22 18:46:40] index.js:76 DEBUG: We're back to full format!
+ERROR: Now without file info or timestamp
+[2025-03-22 18:46:40] index.js:73 INFO: Even this gets styled!
+[2025-03-22 18:53:44] index.js:68 LOG: Hello from the app!
+
+[2025-03-22 18:53:44] index.js:70 WARN: Something might be off...
+ERROR: Now without file info or timestamp
+index.js:68 LOG: Now without timestamp
+[2025-03-22 18:53:44] index.js:69 INFO: Even this gets styled!
+[2025-03-22 18:53:44] index.js:72 DEBUG: We're back to full format!
+ERROR: Now without file info or timestamp
+
+index.js:69 INFO: Now without timestamp

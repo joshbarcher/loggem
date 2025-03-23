@@ -1,22 +1,31 @@
-# 📢 Loggem - Custom Logging Made Easy
+# 📢 Loggem – Custom Logging Made Easy
 
-**Loggem** is a simple yet powerful logging package designed to provide structured and customizable logging for Node.js applications.
+**Loggem** is a drop-in logging enhancement for Node.js that adds styled output, structured formatting, and live configurability — all powered by [`tracer`](https://www.npmjs.com/package/tracer) and monkey-patched `console` functions.
 
-> ⚡ **Built by [Josh Archer](https://github.com/joshbarcher)** and powered by [`tracer`](https://www.npmjs.com/package/tracer), Loggem makes logging effortless.
+> ⚡ Built by [Josh Archer](https://github.com/joshbarcher) with 💛 for CLI tools, APIs, and backend dev workflows.
+
+---
+
+## ✨ Features
+
+- ✅ Colorful, styled terminal output
+- ✅ Smart monkey-patching of `console.log`, `warn`, `error`, etc.
+- ✅ Dynamic config: enable/disable timestamps, file info at runtime
+- ✅ Automatic file logging (with color stripping)
+- ✅ Prints clean blank lines even when monkey-patched
+- ✅ Supports both `logger` and `console` as interfaces
 
 ---
 
 ## 🚀 Installation
 
-To install **Loggem**, use npm:
-
-```sh
+### From Verdaccio (local registry)
+```bash
 npm install @jarcher/loggem --registry http://localhost:4873
 ```
 
-Or install from npm:
-
-```sh
+### Or from npm
+```bash
 npm install @jarcher/loggem
 ```
 
@@ -24,90 +33,83 @@ npm install @jarcher/loggem
 
 ## 📖 Usage
 
-### 1️⃣ **Importing Loggem**
-
-Loggem is an ES module. Import it into your project like this:
-
+### Basic Setup (Auto-monkey-patching)
 ```js
-import createLogger from "@jarcher/loggem";
+import '@jarcher/loggem';
+
+console.log("Hello world");           // Styled + timestamp + file info
+console.warn("Careful!");             // Styled + yellow
+console.log("");                      // Blank line (no formatting)
+
+console.config({ includeTimestamp: false });
+console.log("No timestamp!");
+
+console.config({ includeFileInfo: false });
+console.log("Just the message!");
+
+console.config({ includeTimestamp: true, includeFileInfo: true });
+console.log("Back to full formatting!");
 ```
 
-### 2️⃣ **Configuring the Logger**
-
-You can pass a configuration object to customize the logger:
-
+### Optional: Import the `logger` object directly
 ```js
-const logger = createLogger({
-    level: "info", // Options: trace, debug, info, warn, error
-    format: "{{timestamp}} <{{title}}> {{message}}",
-    dateformat: "HH:MM:ss.L",
-    transports: ["console"] // Future support for file logging
-});
-```
+import { logger } from '@jarcher/loggem';
 
-### 3️⃣ **Basic Logging**
+logger.info("Info level");
+logger.warn("Warning!");
+logger.error("Oops");
+logger.blank(); // Prints a blank line
 
-Once configured, you can start logging:
-
-```js
-logger.info("This is an info message");
-logger.warn("This is a warning message");
-logger.error("This is an error message");
-logger.debug("This is a debug message");
-```
-
-### 4️⃣ **Logging with Objects & Data**
-
-You can pass objects, arrays, and additional metadata into Loggem:
-
-```js
-const user = { name: "Alice", role: "Admin" };
-logger.info("User details:", user);
-```
-
-### 5️⃣ **Using Loggem in Express.js**
-
-Loggem works seamlessly with Express.js:
-
-```js
-import express from "express";
-import createLogger from "@jarcher/loggem";
-
-const logger = createLogger({ level: "info" });
-const app = express();
-
-app.use((req, res, next) => {
-    logger.info(`Incoming request: ${req.method} ${req.url}`);
-    next();
-});
-
-app.listen(3000, () => logger.info("Server running on port 3000"));
+logger.config({ includeTimestamp: false });
+logger.log("Logging with timestamp disabled");
 ```
 
 ---
 
-## 🛠 Configuration
+## ⚙️ Configuration Options
 
-Loggem is built on `tracer`, so you can configure different log outputs:
-
-- **Console Logging** (default)
-- **File Logging** (future support)
-- **JSON Logging** (future support)
-
-Example:
-
+You can update config at runtime via:
 ```js
-import createLogger from "@jarcher/loggem";
+console.config({ ... });
+// or
+logger.config({ ... });
+```
 
-const fileLogger = createLogger({
-    level: "info",
-    format: "{{timestamp}} <{{title}}> {{message}}",
-    dateformat: "HH:MM:ss.L",
-    transports: ["file"], // Future support
-    logFilePath: "./logs/app.log" // Future support
-});
+### Available Options
+| Option              | Type    | Default             | Description                          |
+|---------------------|---------|----------------------|--------------------------------------|
+| `includeTimestamp`  | boolean | `true`               | Show formatted timestamp             |
+| `includeFileInfo`   | boolean | `true`               | Show file:line in output             |
+| `logToFile`         | boolean | `true`               | Enable file logging to `server.log`  |
+| `logFilePath`       | string  | `'server.log'`       | File path for writing logs           |
+| `timestampFormat`   | string  | `'YYYY-MM-DD HH:mm:ss'` | Moment.js format string         |
 
-fileLogger.info("This will be logged to a file!");
+---
+
+## 📃 Log File Output
+
+Loggem writes output to a file (default: `server.log`) **without color codes**, so logs are easy to parse and store.
+
+Blank lines are preserved, and formatting follows the active config.
+
+---
+
+## 🛠️ Troubleshooting
+
+- **Blank lines print extra info?** Use `console.log("")` or `logger.blank()` to print a clean line.
+- **Logger not respecting config?** Make sure you call `console.config()` *before* logging.
+- **Log file missing?** Check `logToFile` is enabled and the path is writable.
+
+---
+
+## 🧪 Example: Minimal Output
+```js
+console.config({ includeTimestamp: false, includeFileInfo: false });
+console.log("Simple message");
+```
+**Output:**
+```
+LOG: Simple message
 ```
 
 ---
@@ -115,21 +117,4 @@ fileLogger.info("This will be logged to a file!");
 ## 📜 License
 
 This package is licensed under **AGPL-3.0**.
-
-For more details, visit the [GitHub repository](https://github.com/joshbarcher/loggem).
-
----
-
-## ⭐ Contributions
-
-Want to improve Loggem? Fork the repo and submit a pull request!
-
----
-
-## 🛠️ Troubleshooting
-
-- Ensure you're using **Node.js 14+**.
-- If logging doesn’t appear, check your console output settings.
-
-🚀 **Happy logging with Loggem!**
 
