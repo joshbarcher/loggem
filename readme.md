@@ -1,6 +1,6 @@
 # 📢 Loggem – Custom Logging Made Easy
 
-**Loggem** is a drop-in logging enhancement for Node.js that adds styled output, structured formatting, and live configurability — all powered by [`tracer`](https://www.npmjs.com/package/tracer) and monkey-patched `console` functions.
+**Loggem** is a drop-in logging enhancement for Node.js that adds styled output, structured formatting, and live configurability.
 
 > ⚡ Built by [Josh Archer](https://github.com/joshbarcher) with 💛 for CLI tools, APIs, and backend dev workflows.
 
@@ -14,19 +14,15 @@
 - ✅ Automatic file logging (with color stripping)
 - ✅ Prints clean blank lines even when monkey-patched
 - ✅ Supports both `logger` and `console` as interfaces
+- ✅ No dependencies on `tracer` (custom formatter used internally)
 
 ---
 
 ## 🚀 Installation
 
-### From Verdaccio (local registry)
+### From internal registry
 ```bash
-npm install @jarcher/loggem --registry http://localhost:4873
-```
-
-### Or from npm
-```bash
-npm install @jarcher/loggem
+npm install @jarcher/loggem --registry https://npm.projectmindforge.com
 ```
 
 ---
@@ -76,13 +72,13 @@ logger.config({ ... });
 ```
 
 ### Available Options
-| Option              | Type    | Default             | Description                          |
-|---------------------|---------|----------------------|--------------------------------------|
-| `includeTimestamp`  | boolean | `true`               | Show formatted timestamp             |
-| `includeFileInfo`   | boolean | `true`               | Show file:line in output             |
-| `logToFile`         | boolean | `true`               | Enable file logging to `server.log`  |
-| `logFilePath`       | string  | `'server.log'`       | File path for writing logs           |
-| `timestampFormat`   | string  | `'YYYY-MM-DD HH:mm:ss'` | Moment.js format string         |
+| Option              | Type    | Default                 | Description                          |
+|---------------------|---------|--------------------------|--------------------------------------|
+| `includeTimestamp`  | boolean | `true`                   | Show formatted timestamp             |
+| `includeFileInfo`   | boolean | `true`                   | Show file:line in output             |
+| `logToFile`         | boolean | `true`                   | Enable file logging to `server.log`  |
+| `logFilePath`       | string  | `'server.log'`           | File path for writing logs           |
+| `timestampFormat`   | string  | `'YYYY-MM-DD HH:mm:ss'` | Moment.js format string              |
 
 ---
 

@@ -1,4 +1,3 @@
-import tracer from 'tracer';
 import chalk from '@jarcher/enhanced-chalk';
 import fs from 'fs';
 import stripAnsi from 'strip-ansi';
@@ -22,54 +21,64 @@ const logLevels = {
     log: chalk.white('LOG')
 };
 
-function buildLogger() {
-    const formatParts = [];
+function getCallerLocation() {
+    const originalPrepareStackTrace = Error.prepareStackTrace;
+    Error.prepareStackTrace = (_, stack) => stack;
+    const err = new Error();
+    const stack = err.stack;
+    Error.prepareStackTrace = originalPrepareStackTrace;
 
-    if (loggerConfig.includeTimestamp) formatParts.push("{{timestamp}}");
-    if (loggerConfig.includeFileInfo) formatParts.push("{{file}}");
-    formatParts.push("{{title}}: {{message}}");
-
-    return tracer.console({
-        format: formatParts.join(' '),
-        preprocess: (data) => {
-            data.title = logLevels[data.title] || data.title;
-
-            if (loggerConfig.includeFileInfo && data.file && data.line) {
-                data.file = chalk.green(`${data.file}:${data.line}`);
-            } else {
-                data.file = '';
-            }
-
-            if (loggerConfig.includeTimestamp) {
-                data.timestamp = chalk.orange(`[${moment().format(loggerConfig.timestampFormat)}]`);
-            } else {
-                data.timestamp = '';
-            }
-        },
-        transport: (data) => {
-            console._nativeLog(data.output); // bypass the monkey-patch
-            if (loggerConfig.logToFile) {
-                fs.appendFile(loggerConfig.logFilePath, stripAnsi(data.output) + '\n', 'utf8', (err) => {
-                    if (err) console._nativeError('Failed to write to log file:', err);
-                });
-            }
+    for (let i = 0; i < stack.length; i++) {
+        const frame = stack[i];
+        const filename = frame.getFileName();
+        if (filename && !filename.includes('loggem') && !filename.includes('node_modules')) {
+            return {
+                file: filename.split('/').pop(),
+                line: frame.getLineNumber()
+            };
         }
-    });
+    }
+    return { file: 'unknown', line: 0 };
 }
 
-let tracerLogger = buildLogger();
+function formatArgs(args) {
+    return args.map(arg =>
+        typeof arg === 'string'
+            ? arg
+            : arg instanceof Error
+                ? arg.stack
+                : JSON.stringify(arg)
+    ).join(' ');
+}
+
+function outputLog(level, ...args) {
+    const { file, line } = getCallerLocation();
+    const timestamp = loggerConfig.includeTimestamp ? chalk.orange(`[${moment().format(loggerConfig.timestampFormat)}]`) : '';
+    const fileInfo = loggerConfig.includeFileInfo ? chalk.green(`${file}:${line}`) : '';
+    const title = logLevels[level] || level.toUpperCase();
+    const message = formatArgs(args);
+
+    const finalOutput = [timestamp, fileInfo, `${title}: ${message}`].filter(Boolean).join(' ');
+
+    console._nativeLog(finalOutput);
+
+    if (loggerConfig.logToFile) {
+        fs.appendFile(loggerConfig.logFilePath, stripAnsi(finalOutput) + '\n', 'utf8', (err) => {
+            if (err) console._nativeError('Failed to write to log file:', err);
+        });
+    }
+}
 
 export const logger = {
     config: (newConfig) => {
         loggerConfig = { ...loggerConfig, ...newConfig };
-        tracerLogger = buildLogger(); // rebuild with new config
     },
 
-    log: (...args) => tracerLogger.log(...args),
-    info: (...args) => tracerLogger.info(...args),
-    warn: (...args) => tracerLogger.warn(...args),
-    error: (...args) => tracerLogger.error(...args),
-    debug: (...args) => tracerLogger.debug(...args),
+    log: (...args) => outputLog('log', ...args),
+    info: (...args) => outputLog('info', ...args),
+    warn: (...args) => outputLog('warn', ...args),
+    error: (...args) => outputLog('error', ...args),
+    debug: (...args) => outputLog('debug', ...args),
 
     blank: () => {
         console._nativeLog('');
@@ -81,7 +90,7 @@ export const logger = {
     }
 };
 
-// 🐒 Monkey-patch console — preserve native methods first
+// 🔒 Monkey-patch console — preserve native methods first
 console._nativeLog = console.log;
 console._nativeInfo = console.info;
 console._nativeWarn = console.warn;
